@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "481456472983",
+    "project_id": "polar-ring-284719",
+    "storage_bucket": "polar-ring-284719.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481456472983:android:d69172607c02c482a17ad2",
+        "android_client_info": {
+          "package_name": "com.example.kotlinmessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481456472983-7lf5j2vd44o53mrb0m5rjoujb88ahe61.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIDJQTcy5W8xVY6Zw19E3WLjueyCNzLEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481456472983-7lf5j2vd44o53mrb0m5rjoujb88ahe61.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

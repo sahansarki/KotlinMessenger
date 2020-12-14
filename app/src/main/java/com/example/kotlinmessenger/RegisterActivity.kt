@@ -16,7 +16,11 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import java.lang.Exception
 import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -114,7 +118,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebaseStorage(){
         if(selectedPhotoUri == null) {
-            Log.d("RegisterActivity" , " Başarısız")
+            Log.d("RegisterActivity" , " İlk Başarısız ")
             return
         }
 
@@ -123,14 +127,59 @@ class RegisterActivity : AppCompatActivity() {
 
         ref.putFile(selectedPhotoUri!!)
                 .addOnSuccessListener {
-                    Log.d("RegisterActivity" , "Succesfully uploaded image : ${it.metadata?.path}")
-                }
-       /*
-        ref.downloadUrl.addOnSuccessListener {
-            Log.d("RegisterActivity" , "File Location:$it")
-        }
+                    Log.d("RegisterActivity", "Succesfully uploaded image : ${it.metadata?.path}")
 
-        */
+
+                    ref.downloadUrl.addOnSuccessListener {
+                        Log.d("RegisterActivity", "File Location:$it")
+                        saveUserToFirebaseDatabase(it.toString())
+                    }
+                }
     }
 
+    private fun saveUserToFirebaseDatabase(profileImageUri: String) {
+
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val db = Firebase.firestore
+
+        val userMap = hashMapOf<String,Any>()
+        userMap.put("User Uid",uid)
+        userMap.put("Username",findViewById<TextView>(R.id.username_edittext_register).text.toString())
+        userMap.put("Profile Image Uri",profileImageUri)
+
+        db.collection("Users").add(userMap).addOnSuccessListener {
+            Log.d("RegisterActivity", "Finally we saved the user to Firebase Database")
+        }.addOnFailureListener{
+            Toast.makeText(this,it.localizedMessage.toString(),Toast.LENGTH_LONG).show()
+        }
+
+        /*
+        val user = User(uid, findViewById<TextView>(R.id.username_edittext_register).text.toString(), profileImageUri)
+        db.collection("Users")
+                .add(user)
+                .addOnSuccessListener {
+                    Log.d("RegisterActivity", "Finally we saved the user to Firebase Database")
+                }
+                .addOnFailureListener { e ->
+                    Log.d("RegisterActivity" , e.printStackTrace().toString())
+                }
+
+           */
+        /*
+
+        val uid = FirebaseAuth.getInstance().uid ?: ""
+        val ref = Firebase.database.getReference("/users")
+
+        val user = User(uid,findViewById<TextView>(R.id.username_edittext_register).text.toString(),profileImageUri)
+        ref.setValue(user)
+            .addOnSuccessListener {
+                Log.d("RegisterActivity" , "Finally we saved the user to Firebase Database")
+            }
+
+
+    }
+
+         */
+    }
 }
+class User(val uid: String , val username: String , val profileImageUri: String)

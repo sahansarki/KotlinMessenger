@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -27,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_register)
 
         val alread_have_account = findViewById<TextView>(R.id.alread_have_account_textView)
         val register_button = findViewById<Button>(R.id.register_button_register)
@@ -57,37 +58,24 @@ class RegisterActivity : AppCompatActivity() {
             if (selectedPhotoUri != null) {
 
                 if (Build.VERSION.SDK_INT >= 28) {
+                    Log.d("RegisterActivity","Buil Version kısmı.")
                     val source = ImageDecoder.createSource(contentResolver, selectedPhotoUri!!)
                     val bitmap = ImageDecoder.decodeBitmap(source)
+                    findViewById<ImageView>(R.id.selectphoto_imageview_register).setImageBitmap(bitmap)
+                    findViewById<Button>(R.id.select_photo_button).alpha = 0f
+                    /*
                     val bitmapDrawable = BitmapDrawable(bitmap)
                     findViewById<Button>(R.id.select_photo_button).background = bitmapDrawable
                     uploadImageToFirebaseStorage()
+                    */
                 }
+
             }
         }
 
         super.onActivityResult(requestCode, resultCode, data)
     }
-/*
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("RegisterActivity" , "İf'e girmemiş...")
-        if(requestCode == 0 && resultCode == Activity.RESULT_OK && data != null) {
-            //proceed and check what the selected image was..
 
-            val selectedPhotoUri = data.data
-            Log.d("RegisterAcitivity" , "SelectedPhotoUri = $selectedPhotoUri")
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhotoUri)
-            val bitmapDrawable = BitmapDrawable(bitmap)
-            findViewById<Button>(R.id.select_photo_button).setBackgroundDrawable(bitmapDrawable)
-            //select_photo_button!!.setBackgroundDrawable(bitmapDrawable)
-        }
-        else{
-            Log.d("RegisterActivity" , "İf'e girmemiş...")
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-
-    }
-*/
     private fun performRegister(){
         val email = findViewById<TextView>(R.id.email_edittext_register).text.toString()
         val password = findViewById<TextView>(R.id.password_edittext_register).text.toString()
@@ -118,7 +106,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun uploadImageToFirebaseStorage(){
         if(selectedPhotoUri == null) {
-            Log.d("RegisterActivity" , " İlk Başarısız ")
+            Log.d("RegisterActivity" , " Foto Uri alınamadı ,  Başarısız ")
             return
         }
 
@@ -149,37 +137,15 @@ class RegisterActivity : AppCompatActivity() {
 
         db.collection("Users").add(userMap).addOnSuccessListener {
             Log.d("RegisterActivity", "Finally we saved the user to Firebase Database")
+
+            val intent = Intent(this,LatestMessagesActivity::class.java)
+            intent.flags =Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK) // önceki aktiviteleri bitirmek için
+            startActivity(intent)
         }.addOnFailureListener{
             Toast.makeText(this,it.localizedMessage.toString(),Toast.LENGTH_LONG).show()
         }
 
-        /*
-        val user = User(uid, findViewById<TextView>(R.id.username_edittext_register).text.toString(), profileImageUri)
-        db.collection("Users")
-                .add(user)
-                .addOnSuccessListener {
-                    Log.d("RegisterActivity", "Finally we saved the user to Firebase Database")
-                }
-                .addOnFailureListener { e ->
-                    Log.d("RegisterActivity" , e.printStackTrace().toString())
-                }
 
-           */
-        /*
-
-        val uid = FirebaseAuth.getInstance().uid ?: ""
-        val ref = Firebase.database.getReference("/users")
-
-        val user = User(uid,findViewById<TextView>(R.id.username_edittext_register).text.toString(),profileImageUri)
-        ref.setValue(user)
-            .addOnSuccessListener {
-                Log.d("RegisterActivity" , "Finally we saved the user to Firebase Database")
-            }
-
-
-    }
-
-         */
     }
 }
 class User(val uid: String , val username: String , val profileImageUri: String)

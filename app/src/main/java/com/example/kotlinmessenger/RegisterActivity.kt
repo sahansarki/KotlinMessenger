@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -61,8 +62,11 @@ class RegisterActivity : AppCompatActivity() {
                     Log.d("RegisterActivity","Buil Version kısmı.")
                     val source = ImageDecoder.createSource(contentResolver, selectedPhotoUri!!)
                     val bitmap = ImageDecoder.decodeBitmap(source)
+
                     findViewById<ImageView>(R.id.selectphoto_imageview_register).setImageBitmap(bitmap)
-                    findViewById<Button>(R.id.select_photo_button).alpha = 0f
+
+//                    findViewById<Button>(R.id.select_photo_button).alpha = 0f
+                    findViewById<Button>(R.id.select_photo_button).visibility = View.INVISIBLE
                     /*
                     val bitmapDrawable = BitmapDrawable(bitmap)
                     findViewById<Button>(R.id.select_photo_button).background = bitmapDrawable
@@ -72,6 +76,7 @@ class RegisterActivity : AppCompatActivity() {
 
             }
         }
+
 
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -148,4 +153,6 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 }
-class User(val uid: String , val username: String , val profileImageUri: String)
+class User(val username: String , val profileImageUri: String , val uid: String){
+    constructor() : this("","","")
+}

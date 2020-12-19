@@ -1,25 +1,19 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.messages
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.registerlogin.User
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
-import kotlin.reflect.typeOf
 
 class NewMessageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +32,11 @@ class NewMessageActivity : AppCompatActivity() {
         */
         fetchUsers()
     }
+
+    companion object{
+        val USER_KEY = "USER_KEY"
+    }
+
     private fun fetchUsers(){
         val db = FirebaseFirestore.getInstance()
         val ref = db.collection("Users")
@@ -51,12 +50,22 @@ class NewMessageActivity : AppCompatActivity() {
                         val username = document.data.getValue("Username").toString()
                         val profile = document.data.getValue("Profile Image Uri").toString()
                         val uid = document.data.getValue("User Uid").toString()
-                        val user = User(username,profile,uid)
+                        val user = User(username, profile, uid)
                         if(user != null) {
                             Log.d("NewMessage" , user.username)
                             adapter.add(UserItem(user))
                         }
 
+                    }
+                    adapter.setOnItemClickListener { item, view ->
+
+                        val userItem = item as UserItem
+
+                        val intent = Intent(view.context, ChatLogActivity::class.java)
+                        intent.putExtra(USER_KEY,userItem.user)
+                        startActivity(intent)
+
+                        finish()
                     }
                     findViewById<RecyclerView>(R.id.recyclerview_newmessage).adapter = adapter
                 }

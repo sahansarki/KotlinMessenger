@@ -1,28 +1,27 @@
 
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.registerlogin
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.example.kotlinmessenger.R
+import com.example.kotlinmessenger.messages.LatestMessagesActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import java.lang.Exception
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -41,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
         alread_have_account.setOnClickListener {
             Log.d("RegisterActivity" , "Try to show login activity")
             //launch the login activity somehow
-            val intent = Intent(this,LoginActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
         select_photo_button.setOnClickListener {
@@ -143,7 +142,7 @@ class RegisterActivity : AppCompatActivity() {
         db.collection("Users").add(userMap).addOnSuccessListener {
             Log.d("RegisterActivity", "Finally we saved the user to Firebase Database")
 
-            val intent = Intent(this,LatestMessagesActivity::class.java)
+            val intent = Intent(this, LatestMessagesActivity::class.java)
             intent.flags =Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK) // önceki aktiviteleri bitirmek için
             startActivity(intent)
         }.addOnFailureListener{
@@ -153,6 +152,7 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 }
-class User(val username: String , val profileImageUri: String , val uid: String){
+@Parcelize
+class User(val username: String , val profileImageUri: String , val uid: String) : Parcelable{
     constructor() : this("","","")
 }

@@ -1,12 +1,12 @@
-package com.example.kotlinmessenger
+package com.example.kotlinmessenger.registerlogin
 
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.kotlinmessenger.R
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
 
 class LoginActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

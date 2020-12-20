@@ -29,7 +29,7 @@ class ChatLogActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
 
-        findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
+        //findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
         if(user != null) {
@@ -63,17 +63,34 @@ class ChatLogActivity : AppCompatActivity() {
         val ref = db.collection("messages")
         ref.get()
                 .addOnCompleteListener() {
+
+                    var hashmap_messages = hashMapOf<String, Long>()
                     for(document in it.result!!) {
-                        if(document.data.getValue("fromId") == FirebaseAuth.getInstance().uid) {
-                            adapter.add(ChatFromITem(document.data.getValue("text").toString()))
+                        val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+                        if(document.data.getValue("fromId") == FirebaseAuth.getInstance().uid || document.data.getValue("toId") == user!!.uid) {
+                            if(document.data.getValue("timestamp") is String) {
+                                document.data.getValue("timestamp").toString().toLong()
+                            }
+                            hashmap_messages.put(document.data.getValue("text").toString(),document.data.getValue("timestamp").toString().toLong())
                         }
-                        else{
-                            val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-                            if(document.data.getValue("toId") == user!!.uid) {
-                                adapter.add(ChatToItem(document.data.getValue("text").toString()))
+
+                    }
+                    val result = hashmap_messages.toList().sortedBy { (_, value) -> value }.toMap()
+                    for (entry in result) {
+                        println("Key: " + entry.key)
+                        println(" Value: " + entry.value)
+                    }
+                    for(i in result) {
+                        for(document in it.result!!) {
+                            if(document.data.getValue("text") == i && document.data.getValue("fromId") == FirebaseAuth.getInstance().uid) {
+                                adapter.add(ChatFromITem(i.key))
+                            }
+                            else{
+                                adapter.add(ChatToItem(i.key))
                             }
                         }
                     }
+
                     findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
                 }
@@ -93,8 +110,10 @@ class ChatLogActivity : AppCompatActivity() {
 
         if(fromId == null) return
         val db = Firebase.firestore
-        val chatMessage = ChatMessage(db.collection("messages").id,text,fromId,toId,System.currentTimeMillis()/1000)
-
+        val chatMessage = ChatMessage(db.collection("messages").id , text , fromId,toId,System.currentTimeMillis()/1000)
+        val chatMessage2 = chatMessage.text
+        adapter.add(ChatFromITem(chatMessage2))
+        findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
         db.collection("messages").add(chatMessage).addOnSuccessListener {
             Log.d("ChatLog","Saved our chat message : ${it.id}") //*****

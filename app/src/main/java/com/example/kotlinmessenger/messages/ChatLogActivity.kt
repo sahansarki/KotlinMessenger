@@ -25,13 +25,15 @@ class ChatLogActivity : AppCompatActivity() {
 
     val adapter = GroupAdapter<ViewHolder>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_log)
 
-        //findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
+        findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+
         if(user != null) {
             supportActionBar?.title = user!!.username
 
@@ -44,30 +46,17 @@ class ChatLogActivity : AppCompatActivity() {
         }
     }
 
-    /*
-    for(document in it.result!!) {
-                        Log.d("NewMessage",document.data.toString())
-                        val username = document.data.getValue("Username").toString()
-                        val profile = document.data.getValue("Profile Image Uri").toString()
-                        val uid = document.data.getValue("User Uid").toString()
-                        val user = User(username, profile, uid)
-                        if(user != null) {
-                            Log.d("NewMessage" , user.username)
-                            adapter.add(UserItem(user))
-                        }
-
-                    }
-     */
     private fun listenForMessages() {
         val db = Firebase.firestore
         val ref = db.collection("messages")
         ref.get()
                 .addOnCompleteListener() {
-
                     var hashmap_messages = hashMapOf<String, Long>()
                     for(document in it.result!!) {
+                        //println(document.data.getValue("text").toString())
                         val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
-                        if(document.data.getValue("fromId") == FirebaseAuth.getInstance().uid || document.data.getValue("toId") == user!!.uid) {
+                        if(document.data.getValue("fromId") == FirebaseAuth.getInstance().uid && document.data.getValue("toId") == user!!.uid || document.data.getValue("toId") == FirebaseAuth.getInstance().uid && document.data.getValue("fromId") == user!!.uid) {
+                            //Log.d("ListenForMessages" , "MessageApo : ${document.data.getValue("text")}")
                             if(document.data.getValue("timestamp") is String) {
                                 document.data.getValue("timestamp").toString().toLong()
                             }
@@ -82,16 +71,23 @@ class ChatLogActivity : AppCompatActivity() {
                     }
                     for(i in result) {
                         for(document in it.result!!) {
-                            if(document.data.getValue("text") == i && document.data.getValue("fromId") == FirebaseAuth.getInstance().uid) {
+                            if(document.data.getValue("text") == i.key && document.data.getValue("fromId") == FirebaseAuth.getInstance().uid) {
+                                Log.d("listenForMessagesFromTo" , "message : ${i.key} ")
                                 adapter.add(ChatFromITem(i.key))
+
                             }
                             else{
-                                adapter.add(ChatToItem(i.key))
+                                val user = intent.getParcelableExtra<User>(NewMessageActivity.USER_KEY)
+                                if(document.data.getValue("fromId") == user!!.uid) {
+                                    Log.d("listenForMessagesFromTo" , "message : ${i.key} ")
+                                    adapter.add(ChatToItem(i.key))
+                                }
+
                             }
                         }
                     }
 
-                    findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
+                    //findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
                 }
 
@@ -111,12 +107,13 @@ class ChatLogActivity : AppCompatActivity() {
         if(fromId == null) return
         val db = Firebase.firestore
         val chatMessage = ChatMessage(db.collection("messages").id , text , fromId,toId,System.currentTimeMillis()/1000)
+        Log.d("ChatLogPerform","messages id = ${db.collection("messages").id}")
         val chatMessage2 = chatMessage.text
         adapter.add(ChatFromITem(chatMessage2))
-        findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
+        //findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
         db.collection("messages").add(chatMessage).addOnSuccessListener {
-            Log.d("ChatLog","Saved our chat message : ${it.id}") //*****
+            Log.d("ChatLogPerform","Saved our chat message : ${it.id}") //*****
         }
     }
     private fun setupDummyData(){

@@ -58,7 +58,6 @@ class NewMessageActivity : AppCompatActivity() {
 
                     }
                     adapter.setOnItemClickListener { item, view ->
-                        Log.d("NewMEssages" , "Item özellikleri : ${item.id}")
                         val userItem = item as UserItem
 
                         val intent = Intent(view.context, ChatLogActivity::class.java)

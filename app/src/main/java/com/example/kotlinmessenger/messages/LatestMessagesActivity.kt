@@ -3,18 +3,50 @@ package com.example.kotlinmessenger.messages
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.example.kotlinmessenger.R
 import com.example.kotlinmessenger.registerlogin.RegisterActivity
+import com.example.kotlinmessenger.registerlogin.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class LatestMessagesActivity : AppCompatActivity() {
+
+    companion object{
+        var currentUser: User? = null
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_latest_messages)
-
+        fetchCurrentUser()
         verifyUserLoggedIn()
+    }
+
+    private fun fetchCurrentUser(){
+        val db = FirebaseFirestore.getInstance()
+        val uid = FirebaseAuth.getInstance().uid
+        Log.d("LatestMessages" , "Uid : ${uid}")
+
+        val ref = db.collection("Users")
+        ref.get()
+                .addOnCompleteListener{
+                    for(document in it.result!!) {
+                        Log.d("LatestMessages" , "Document id = ${document.id}")
+                        if(document.data.getValue("User Uid")== uid) {
+                            val username = document.data.getValue("Username").toString()
+                            val profile = document.data.getValue("Profile Image Uri").toString()
+                            val uid = document.data.getValue("User Uid").toString()
+                            currentUser = User(username, profile, uid)
+                            Log.d("LatestMessages" , "Current user : ${currentUser?.profileImageUri}")
+                        }
+
+                    }
+                }
+
     }
 
     private fun verifyUserLoggedIn(){

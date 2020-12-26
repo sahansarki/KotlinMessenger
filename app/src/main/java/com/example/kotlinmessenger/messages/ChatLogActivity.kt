@@ -15,6 +15,8 @@ import com.example.kotlinmessenger.models.ChatMessage
 import com.example.kotlinmessenger.registerlogin.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
@@ -112,12 +114,23 @@ class ChatLogActivity : AppCompatActivity() {
         val currentUser = LatestMessagesActivity.currentUser
         adapter.add(ChatFromITem(chatMessage2,currentUser!!))
 
+        val latestmessage = hashMapOf(
+                "fromId" to "$fromId",
+                "message" to "$chatMessage2",
+                "toId" to "$toId"
+        )
+
+
+        val ref = db.collection("LatestMessages").document("$fromId-$toId")
+        //val mesaj_ref = ref.collection("$toId").document("$fromId")
+        ref.set(latestmessage, SetOptions.merge())
         findViewById<TextView>(R.id.edittext_chatlog).text = ""
         //findViewById<RecyclerView>(R.id.recylerview_chatlog).adapter = adapter
 
         db.collection("messages").add(chatMessage).addOnSuccessListener {
             Log.d("ChatLogPerform","Saved our chat message : ${it.id}") //*****
         }
+
     }
 }
    class ChatFromITem(val text: String , val user : User) : Item<ViewHolder>() {

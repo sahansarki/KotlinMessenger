@@ -3,6 +3,7 @@ package com.example.kotlinmessenger.messages
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +21,7 @@ import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.ViewHolder
+import kotlinx.android.parcel.Parcelize
 
 class LatestMessagesActivity : AppCompatActivity() {
     val adapter_latestMessages = GroupAdapter<ViewHolder>()
@@ -79,14 +81,23 @@ class LatestMessagesActivity : AppCompatActivity() {
                                             val uri = document2.data.getValue("Profile Image Uri").toString()
                                             val uid = document2.data.getValue("User Uid").toString()
                                             val text = document.data.getValue("message").toString()
-                                            currentUser = User(username,uri,uid)
+                                            var toUser = User(username,uri,uid)
 
-                                            adapter_latestMessages.add(LatestMessageRow(text,currentUser!!))
+                                            adapter_latestMessages.add(LatestMessageRow(text,toUser!!))
+
                                         }
                                     }
                                 }
                     }
+
                 }
+        adapter_latestMessages.setOnItemClickListener{item, view ->
+            val userItem_lastMessages = item as LatestMessageRow
+            val intent = Intent(view.context, ChatLogActivity::class.java)
+            intent.putExtra(NewMessageActivity.USER_KEY,userItem_lastMessages.user)
+            startActivity(intent)
+
+        }
 
 
     }
@@ -146,3 +157,5 @@ class LatestMessagesActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 }
+
+

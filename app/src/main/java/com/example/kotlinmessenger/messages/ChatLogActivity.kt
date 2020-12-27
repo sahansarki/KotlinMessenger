@@ -48,6 +48,7 @@ class ChatLogActivity : AppCompatActivity() {
                 performSendMessage()
             }
         }
+
     }
 
     private fun listenForMessages() {
@@ -110,14 +111,14 @@ class ChatLogActivity : AppCompatActivity() {
         val db = Firebase.firestore
         val chatMessage = ChatMessage(db.collection("messages").id , text , fromId,toId,System.currentTimeMillis()/1000)
         Log.d("ChatLogPerform","messages id = ${db.collection("messages").id}")
-        val chatMessage2 = chatMessage.text
         val currentUser = LatestMessagesActivity.currentUser
-        adapter.add(ChatFromITem(chatMessage2,currentUser!!))
+        adapter.add(ChatFromITem(chatMessage.text,currentUser!!))
 
         val latestmessage = hashMapOf(
                 "fromId" to "$fromId",
-                "message" to "$chatMessage2",
-                "toId" to "$toId"
+                "message" to "${chatMessage.text}",
+                "toId" to "$toId" ,
+                "timestamp" to "${chatMessage.timestamp}"
         )
 
 
